@@ -1,31 +1,31 @@
 OMF Quick Start 
 ===============
+
+This section provides a brief introduction to all of the steps necessary to begin the development process. Using the OMF 1.0 
+specification and the steps in this section, it is possible to develop a minimal data ingress OMF application. More 
+advanced applications ones can be found in the OMF samples. 
  
-This section describes all necessary steps to start the development process, and goes into details... Using OMF 1.0 
-specification, it is possible to develop as minimal data ingress OMF applications as shown in this section, or more 
-complex ones that you can find in OMF samples. 
- 
- 
-For development process, and ease of configuration, it is recommended that all of the following products be 
-installed on the machine(s) in the same Windows Domain, and that you have sufficient access rights. Please note, 
-the current document is targeted on the OMF application development process, and not on administrative aspects 
-of configuring and securing the entire solution built using OSIsoft PI System. 
+To speed the development process, it is recommended that all of the following products be 
+installed on your computer the machine(s) in the same Windows Domain, and that you have sufficient access rights. 
+
+Note that this topic demonstrates the basic OMF application development process, and not the administrative aspects 
+of configuring and securing the entire solution you build using OSIsoft PI System. 
 
 Development Environment 
 -----------------------
 
-The following products should be installed and configured:
+Before you begin, the following products should be installed and configured:
 
 * PI Data collection Manager 
 
-  As a developer, you need an administrative access to the DCM. You will need to be able to create PI Server, 
-  Relay and OMF application nodes, establish connections between them, and retrieve necessary registration 
+  As a developer, you must have administrative access to the DCM. You will need to be able to create PI Server, 
+  Relay, and OMF application nodes, establish connections between them, and retrieve the necessary registration 
   information, which you will use in your OMF application in authentication and authorization process. For 
-  more information, see PI Data Collection Manager user manual. 
+  more information, see *PI Data Collection Manager* user manual. 
   
 * PI Connector Relay
 
-  It is highly recommended that you install and configure your own, development instance of the Relay. During 
+  It is highly recommended that you install and configure your own development instance of the Relay. During 
   development process, you will need to stop and re-start Relay process, manually delete cache files, and 
   perform other actions, which may distract other data sources from sending data to the PI System. For more 
   information, see PI Connector Relay user manual. 
@@ -84,7 +84,7 @@ GZIP compression. For clarity, we do not using compression in this walk-through.
 For this minimal application, you need to define an OMF type with "classification" set to "dynamic", 
 to define a data stream class. Note, that all OMF identifies are case sensitive.  
 
-::
+ ::
 
   [{ 
     "id": "DataType", 
@@ -147,8 +147,12 @@ PI System, and your data successfully arrived into PI Data Archive. This simple 
 and stores one value in it. 
 
 To validate, open PI System Management Tools, navigate to Points/Point Builder, and search for your PI point. 
-Its name should be {name of OMF application how you registered it with DCM}.container1. Hover the mouse over 
-it, and validate PI point's value and its timestamp. For more information, see PI System Management Tools user manual. 
+Its name should be as follows:
+
+``name of OMF application that you registered with DCM.container1`` 
+
+Hover the mouse over the name and validate the PI point value and timestamp. For more information, see PI System 
+*Management Tools user manual*. 
 
 Step 6 – cleanup
 ----------------
