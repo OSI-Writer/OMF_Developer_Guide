@@ -93,8 +93,65 @@ e. Update data stream (container) instances with time series values. These will 
    in OMF Data messages, and update AF attributes with PI point references. 
 
 
+Development Environment Cleanup 
+-------------------------------
 
+In OMF applications, type definitions and their representations in PI System, are immutable – you cannot 
+make any changes to the properties of the type, which has been already sent to the Relay's ingress endpoint. 
+The same is true for instances of these types (assets and containers), and linkage between them. Once you 
+create concrete instances of these types and link them together by sending container and data messages to 
+the Relay's ingress endpoint, you cannot redefine them. 
 
+Once the OMF application has been developed and deployed, the only changed data that are expected by ingress 
+is the values of your timeseries data – values sent to the container(s) in data messages. 
 
+Only in error situations, when Relay loses its cache, type, asset and container, and their linkage information 
+should be resent to the Relay. To recover from this, you can send this meta information every time your 
+application restarts, having that NO changes were made to these definitions and instantiations. 
+ 
+As a developer, you will have to deal with changes in the types, structures of your assets in AF, etc. 
+To be able to perform such changes, you need to understand how to properly cleanup your development 
+environment, and when cleanups are required. 
+ 
+As a rule of thumb, you need to perform a cleanup: 
 
+* Change was made to a type (basically – any change): 
+
+  * You modified a name or description of the type or one of its properties 
+  * You added, removed, renamed a property 
+  * You changed a type of a property (i.e. from number to string, etc.) 
+  
+* Change was made to a container 
+
+  * You redefined container typeid to another dynamic type 
+  
+* Change was made to a data (except of data values that you send to containerids): 
+
+  * You redefined asset typeid to another static type 
+  * You changed anything that you previously sent in the "__LINK" object 
+ 
+
+*Cleanup:*
+
+1. Relay's temporary cache location. 
+   Stop the Relay process. By default, if not chosen during Relay setup, temporary data will be stored in
+   C:\ProgramData\OSIsoft\Tau\Relay.ConnectorHost. Delete this folder. 
+   Deleting this folder will remove all cache for all producers. 
+   
+2. PI System AF Database that you use to create your AF asset structure.
+   In PI System Explorer, open Library, expand Templates/Element Templates. Delete all templates with 
+   names starting with "OMF". 
+   In PI System Explorer, open Elements, expand Elements root node. Delete all elements and their 
+   children elements that has names of you OMF application instances registrations. 
+   In PI System Explorer, check-in all your deletion changes. 
+   
+3. PI Data Archive PI points that were created once you sent container data values. 
+   In PI System Management Tool, open Points/Point Builder. Search for PI tags that has names starting with 
+   your OMF application instance registration. Delete all of them. 
+ 
+Operation #1 is required always. 
+
+Operation #2 is required if your application defines and links static types. 
+
+Operation #3 is required if you previously sent data values to containers. 
 
