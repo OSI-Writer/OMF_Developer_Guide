@@ -1,67 +1,67 @@
-Data ingress to PI System using OMF 
-===================================
+PI System data ingress using OMF 
+================================
 
 You use OSIsoft Message Format (OMF) to achieve high-throughput asynchronous data ingress into the PI System. 
 The following terms and references might be useful for understanding the information in this and subsequent topics: 
 
-* A producer of OMF messages intended for PI System is called OMF application instance. 
-* Every producer shall be registered with PI System to be able to ingress OMF data. For registration process, see PI Data Collection
-  Manager user manual. 
-* Producers are categorized by OMF application types. Type serves as a namespace for unique OMF type definitions (see OMF 1.0
-  specification), and their translations into PI AF Element Templates (see PI System Explorer user manual). 
-* OMF messages are divided into three categories (see OMF 1.0 specification), which perform several different actions in the PI System.
-  Sequence of the messages, and whether they are required to be sent on each producer restart are important to understand 
+* A producer of OMF messages intended for the PI System is called an *OMF application instance*. 
+* Every producer must be registered with the PI System to be able to ingress OMF data. For informatin about the 
+  registration process, see *PI Data Collection Manager* user manual. 
+* Producers are categorized by OMF application types. A Type serves as a namespace for unique OMF type definitions (see *OMF 1.0
+  specification*). A type also translates into PI AF Element Templates (see *PI System Explorer user manual*). 
+* OMF messages are divided into three categories (see *OMF 1.0 specification*), which perform several different actions in the PI System.
+  The sequence of the messages, and whether they are required to be sent by a producer restart, are important to understand 
   (see Quick Start section). 
 
 Introduction 
 ------------
 
-As a third-party OMF application developer, creating an application for your data ingress into PI System, you need to: 
+Before creating your application, it helps to review and understand each of the following points:
 
-* Understand your data, how to present this data in the PI System back-end, and finally how to write OMF messages, so 
-  that appropriate AF templates, element trees with all required attributes, and associated PI points are created in 
-  PI AF and PI Data Historian, and updated with your timeseries data. 
-* Start your code development by setting up required environment, registering your development application instance with 
-  the DCM/Relay to get appropriate authorization to feed data into PI System, and write and send OMF messages to the 
+* Understand your data and how to the data should be stored in the PI System back end. Also, understand how to write 
+  OMF messages, so that appropriate AF templates, element trees (with required attributes), and associated PI points,
+  are created in PI AF and PI Data Historian, and how they are updated with your timeseries data. 
+* Start your code development by configuring the required environment, registering your development application instance with 
+  the DCM/Relay (to obtain authorization to feed data into PI System), and write and send OMF messages to the 
   Relay's Ingress HTTP(S) REST endpoint. 
-* Know how to make development changes to your OMF types, instances and links – what needs to be manually cleaned up, 
-  etc., and how to troubleshoot your code. 
+* Know how to make development changes to your OMF types, instances, and links. Know what must be manually cleaned up, 
+  and how to troubleshoot your code. 
 
 Understanding your data 
 -----------------------
 
 a. Identify your assets. 
 
-   *  Physical – representing plants, sites, equipment, I/O devices, etc. These assets can have static attributes, 
-      which will stay immutable, or which value changes will not be recorded in the data historian. Example: serial 
-      number of I/O device. 
-   *  Logical – data streams, representing collections of values, which should be sent to Relay ingress as one 
-      transaction. I.e. all values of a given stream should be sent in one update, no one separate value can be 
-      skipped. Data for each of these points in the stream will be recorded into the data historian with an appropriate timestamp. 
+   *  Physical – Physical assests represent things such as plants, sites, equipment, I/O devices, and so on. Assets may 
+      have static attributes (which will remain immutable), or may have values that change and will not be recorded in 
+      the data historian (such as a serial I/O device). 
+   *  Logical – Logical assets represent things such as data streams (representing collections of values), which 
+      should be sent to the Relay ingress as a single transaction; that is, all values of a given stream should 
+      be sent in a single update; no one single value can be skipped. Data for each of these points in the stream 
+      is recorded into the data historian with an appropriate timestamp. 
 b. Identify hierarchical relationships between your assets and data streams. 
 
-   *  Physical assets structure - top-most asset, which has a collection of equipment, each of which has 
-      collection of I/O devices. For example: vehicle top-level asset with attached child asset engine, 
-      and attached children assets wheels. 
-   *  Data stream assets, which can be attached to any of your physical assets. For example: stream of two 
-      values – longitude and latitude, which can be attached to your vehicle asset, and stream of two 
-      values – RPM and pressure of your vehicle's engine asset. 
+   *  Structures of physical assets - For example, you might have an asset at the top-most level, which contains a 
+      collection of equipment, each of which has a collection of I/O devices. An example of this might be a vehicle 
+      as a top-level asset with attached child asset engine and attached children's wheels. 
+   *  Data stream assets, which can be attached to any of your physical assets. For example, a stream of two 
+      values consisting of longitude and latitude can be attached to your vehicle asset, as well as a stream of two 
+      values such as RPM and pressure of your vehicle's engine. 
 
 
 Identify PI System's "reference model" of your data 
 ---------------------------------------------------
 
-Note: why do we call it "reference model". This model should concentrate on a physical/real-world aspects 
-of your system. It should model you system from the deep technical, engineering perspective, which is 
-"understandable" by technical people. You do not want to pursue the goal of making this AF model/structure 
-understandable for each and every person in your company, including engineering, accounting, management, 
-executive, etc. - this is a recipe for your project failure! Keep it simple! If you are adopted/adapting 
-OSIsoft PI System, know the tools that we are providing. One of them is AF Schema Mapper 
+Your system's reference model allows you to categorize the physical and real-world aspects 
+of your system. The reference model should model your system from a technical, engineering perspective, which can be understood
+technical personel. It is not necessary to make the AF model and structure 
+understandable to each and every person in your organization. Keep the structure simple! If you are adopting or adapting 
+OSIsoft PI System, you should know the tools that are provided, such as AF Schema Mapper, 
 (or what's its name???), which allows you to build different representations of your reference model for 
-different business units of your company. 
- 
-For more information about AF, see PI AF Explorer, PI AF SDK user manuals. 
- 
+different business units of your organization. 
+
+For more information about AF, see *PI AF Explorer* and *PI AF SDK* user manuals. 
+
 a. Map your data's physical assets to AF elements. 
 b. Link your data's physical assets together to create appropriate AF tree structure. 
 c. Link your stream assets to appropriate AF elements to create dynamic element attributes, 
@@ -70,7 +70,7 @@ c. Link your stream assets to appropriate AF elements to create dynamic element 
 Write OMF messages to create your reference model and start feeding data into PI System 
 ---------------------------------------------------------------------------------------
 
-For more information see OMF 1.0 specification. 
+For more information see *OMF 1.0* specification. 
  
 a. Create OMF type definitions, which will represent your physical and data stream assets. 
    These will be sent to Relay ingress in OMF Type messages. 
